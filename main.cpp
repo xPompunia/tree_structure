@@ -1,6 +1,6 @@
 #include<iostream>
 #include<vector>
-#define N 11
+#define N 100
 
 struct node {
     int value;
@@ -31,8 +31,25 @@ void addNode(node *root, int n) {
 void inorderPrint(node *root) {
     if (root != nullptr) {
         inorderPrint(root->left);
-        std::cout << root->value << "\n";
+        std::cout << root->value << " -> ";
         inorderPrint(root->right);
+    }
+}
+
+void preorderPrint(node *root) {
+    if (root != nullptr) {
+        std::cout << root->value << " -> ";
+        preorderPrint(root->left);
+        preorderPrint(root->right);
+    }
+}
+
+void postOrderDelete(node *root) {
+    if (root != nullptr) {
+        postOrderDelete(root->left);
+        postOrderDelete(root->right);
+        std::cout << "Deleting node with key: " << root->value << "\n";
+        delete root;
     }
 }
 
@@ -40,42 +57,68 @@ int findMax(node *root) {
     if (root == nullptr)
         return -1;
     while (root->right != nullptr) {
+        std::cout << root->value << " -> ";
         root = root->right;
     }
     return root->value;
 }
 
-node* buildBST(std::vector<int>& sortedArray, int start, int end) {
+int findMin(node *root) {
+    if (root == nullptr) {
+        std::cout << "Drzewo jest puste.\n";
+        return -1;
+    }
+    std::cout << "Sciezka poszukiwania (od korzenia do minimalnego elementu): ";
+    while (root->left != nullptr) {
+        std::cout << root->value << " -> ";
+        root = root->left;
+    }
+    return root->value;
+}
+
+node* buildAVL(std::vector<int>& sortedArray, int start, int end) {
     if (start > end)
         return nullptr;
 
     int mid = (start + end) / 2;
     node* root = new node(sortedArray[mid]);
-    root->left = buildBST(sortedArray, start, mid - 1);
-    root->right = buildBST(sortedArray, mid + 1, end);
+    root->left = buildAVL(sortedArray, start, mid - 1);
+    root->right = buildAVL(sortedArray, mid + 1, end);
 
     return root;
 }
 
 int main() {
+//    TWORZENIE ZDEGENEROWANEGO DRZEWA BST
     int *n;
     n = new int[N];
     for(int i=0; i < N; ++i)
-        n[i] = i;
+        n[i] = i+1;
 
     node *root = new node(n[0]);
     for (int i = 1; i < N; ++i) {
         addNode(root, n[i]);
     }
-    inorderPrint(root);
+    std::cout << "Przeszukiwanie Preorder: ";
+    preorderPrint(root);
+    std::cout << std::endl;
 
-    int maxElement = findMax(root);
-    std::cout << "Maksymalny element w drzewie: " << maxElement << std::endl;
+    std::cout << "Maksymalny element w drzewie: " << findMax(root) << std::endl;
+    std::cout << "Minimalny element w drzewie: " << findMin(root) << std::endl;
 
-    std::vector<int> sortedArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+// TWORZENIE DRZEWA AVL METODA POLOWIENIA BINARNEGO
+    std::vector<int> sortedArray;
+    for (int i = 1; i <= 100; ++i) {
+        sortedArray.push_back(i);
+    }
 
-    node* root2 = buildBST(sortedArray, 0, sortedArray.size() - 1);
-    inorderPrint(root2);
+    node* root2 = buildAVL(sortedArray, 0, sortedArray.size() - 1);
+    std::cout << "Przeszukiwanie Preorder: ";
+    preorderPrint(root2);
+    std::cout << std::endl;
+
+    std::cout << "Maksymalny element w drzewie: " << findMax(root2) << std::endl;
+    std::cout << "Minimalny element w drzewie: " << findMin(root2) << std::endl;
     delete[] n;
     return 0;
 }
