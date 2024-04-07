@@ -43,6 +43,41 @@ void preorderPrint(node *root) {
         preorderPrint(root->right);
     }
 }
+void postorderPrint(node *root) {
+    if (root != nullptr) {
+        preorderPrint(root->left);
+        preorderPrint(root->right);
+        std::cout << root->value << " -> ";
+    }
+}
+
+node* deleteNode(node* root, int val) {
+    if (root == nullptr)
+        return root;
+
+    if (val < root->value)
+        root->left = deleteNode(root->left, val);
+    else if (val > root->value)
+        root->right = deleteNode(root->right, val);
+    else {
+        if (root->left == nullptr) {
+            node* temp = root->right;
+            delete root;
+            return temp;
+        }
+        else if (root->right == nullptr) {
+            node* temp = root->left;
+            delete root;
+            return temp;
+        }
+        node* temp = root->right;
+        while (temp->left != nullptr)
+            temp = temp->left;
+        root->value = temp->value;
+        root->right = deleteNode(root->right, temp->value);
+    }
+    return root;
+}
 
 void postOrderDelete(node *root) {
     if (root != nullptr) {
@@ -54,8 +89,11 @@ void postOrderDelete(node *root) {
 }
 
 int findMax(node *root) {
-    if (root == nullptr)
+    if (root == nullptr){
+        std::cout << "Drzewo jest puste.\n";
         return -1;
+    }
+    std::cout << "Sciezka poszukiwania (od korzenia do maksymalnego elementu): ";
     while (root->right != nullptr) {
         std::cout << root->value << " -> ";
         root = root->right;
